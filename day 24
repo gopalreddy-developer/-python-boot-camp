@@ -1,0 +1,120 @@
+
+Day 24
+---------------------------------------------------------------------------------------------------------
+Python JSON
+1. Create a JSON of all object types and import the JSON into a SQL Database
+Note: The JSON file should have valus of all Datatypes
+In [1]:
+import json
+In [2]:
+json_data=[
+    {'name':"Dhivya",'age':21,'Permanent_staff':True,'salary':75000.00,'dept_desgn':'Developer'},
+     {'name':"Renu",'age':35,'Permanent_staff':False,'salary':56000.00,'dept_desgn':"ML Engineer"},
+     {'name':"Manu",'age':34,'Permanent_staff':True,'salary':78000.00,'dept_desgn':'Web Designer'},
+     {'name':"Shardha",'age':23,'Permanent_staff':True,'salary':45000.00,'dept_desgn':'Data Scientist'},
+     {'name':"Kumar",'age':21,'Permanent_staff':True,'salary':67000.00,'dept_desgn':'Manager'}
+    
+]
+In [3]:
+res =json.dumps(json_data)
+In [4]:
+import mysql.connector
+In [5]:
+mydb = mysql.connector.connect(
+  host="localhost",
+  user="root",
+  password="1234"
+)
+In [6]:
+print(mydb)
+<mysql.connector.connection_cext.CMySQLConnection object at 0x000001E8E7EDF670>
+In [7]:
+dbse = mydb.cursor()
+
+dbse.execute("CREATE DATABASE JSONRECORDS2")
+In [8]:
+dbse = mydb.cursor()
+
+dbse.execute("SHOW DATABASES")
+
+for entry in dbse:
+  print(entry)
+('doctor',)
+('doctors1',)
+('employee_mangement',)
+('grocerystore',)
+('information_schema',)
+('jsonrecords',)
+('jsonrecords1',)
+('jsonrecords2',)
+('mydatabase',)
+('mysql',)
+('performance_schema',)
+('sakila',)
+('students_management_system',)
+('sys',)
+('world',)
+In [10]:
+mydb = mysql.connector.connect(
+  host="localhost",
+ user="root",
+  password="1234",
+  database="jsonrecords2"
+)
+dbse = mydb.cursor()
+
+dbse.execute("CREATE TABLE employee (name VARCHAR(255),age INT, permanent_staff VARCHAR(255), salary DOUBLE, dept_and_designation VARCHAR(255))")
+In [11]:
+dbse = mydb.cursor()
+
+dbse.execute("SHOW TABLES")
+
+for value in dbse:
+  print(value)
+('employee',)
+In [12]:
+dbse = mydb.cursor()
+
+dbse.execute("SHOW COLUMNS FROM employee")
+
+for value in dbse:
+  print(value)
+('name', b'varchar(255)', 'YES', '', None, '')
+('age', b'int', 'YES', '', None, '')
+('permanent_staff', b'varchar(255)', 'YES', '', None, '')
+('salary', b'double', 'YES', '', None, '')
+('dept_and_designation', b'varchar(255)', 'YES', '', None, '')
+In [15]:
+dbse = mydb.cursor()
+sql = "INSERT INTO employee (name ,age, permanent_staff,salary,dept_designation) VALUES (%(name)s,%(age)s,%(permanent_staff)s,%(salary)s,%(dept_designation)s)"
+for i in res:
+    dbse.execute(sql,i)
+    
+mydb.commit()
+dbse.close()
+mydb.close()
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+<ipython-input-15-6bf9dfb54fd7> in <module>
+      2 sql = "INSERT INTO employee (name ,age, permanent_staff,salary,dept_designation) VALUES (%(name)s,%(age)s,%(permanent_staff)s,%(salary)s,%(dept_designation)s)"
+      3 for i in res:
+----> 4     dbse.execute(sql,i)
+      5 
+      6 mydb.commit()
+
+~\New folder\lib\site-packages\mysql\connector\cursor_cext.py in execute(self, operation, params, multi)
+    255 
+    256         if params:
+--> 257             prepared = self._cnx.prepare_for_mysql(params)
+    258             if isinstance(prepared, dict):
+    259                 for key, value in prepared.items():
+
+~\New folder\lib\site-packages\mysql\connector\connection_cext.py in prepare_for_mysql(self, params)
+    649                 result[key] = self._cmysql.convert_to_mysql(value)[0]
+    650         else:
+--> 651             raise ValueError("Could not process parameters")
+    652 
+    653         return result
+
+ValueError: Could not process parameters
+In [ ]:
